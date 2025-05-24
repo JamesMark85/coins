@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多任务金币设置</title>
+    <style>
+        :root {
+            --primary: #4285F4;
+            --secondary: #34A853;
+            --danger: #EA4335;
+            --gold: #FFD700;
+            --gray: #888;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .task-list {
+            margin-bottom: 30px;
+        }
+        
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .task-item:last-child {
+            border-bottom: none;
+        }
+        
+        .task-info {
+            flex: 1;
+        }
+        
+        .task-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .task-coins {
+            font-weight: bold;
+        }
+        
+        .coins-available {
+            color: var(--gold);
+        }
+        
+        .coins-collected {
+            color: var(--gray);
+        }
+        
+        .task-status {
+            font-size: 0.9rem;
+            color: var(--secondary);
+            margin-left: 10px;
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .add-task {
+            display: flex;
+            margin-top: 20px;
+        }
+        
+        .add-task input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        
+        .add-task select {
+            width: 80px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        
+        .coin-settings {
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid #eee;
+        }
+        
+        .coin-settings h2 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .coin-inputs {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .coin-input {
+            flex: 1;
+        }
+        
+        .coin-input label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+        }
+        
+        .coin-input input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .reset-btn {
+            background: #FF9800;
+            color: white;
+            margin-top: 15px;
+        }
+
+        /* 新增金币参考说明样式 */
+        .coin-reference {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .coin-reference h3 {
+            color: var(--primary);
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        
+        .coin-levels {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .coin-level {
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .coin-level .amount {
+            font-weight: bold;
+            color: var(--gold);
+            font-size: 1.2rem;
+        }
+        
+        .coin-level .desc {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>多任务金币设置</h1>
+        
+        <div class="coin-settings">
+            <h2>金币初始化设置</h2>
+            <div class="coin-inputs">
+                <div class="coin-input">
+                    <label>总金币</label>
+                    <input type="number" id="total-coins" placeholder="输入总金币数">
+                </div>
+                <div class="coin-input">
+                    <label>今日已领取</label>
+                    <input type="number" id="today-collected" placeholder="输入今日已领取金币">
+                </div>
+            </div>
+            <button class="btn btn-primary" id="save-coins-btn">保存金币设置</button>
+            <button class="btn reset-btn" id="reset-coins-btn">重置金币数据</button>
+        </div>
+        
+        <div class="task-list" id="task-list">
+            <!-- 任务列表将通过JavaScript动态生成 -->
+        </div>
+        
+        <div class="add-task">
+            <input type="text" id="task-name" placeholder="输入任务名称">
+            <select id="task-coins">
+                <option value="1">1金币</option>
+                <option value="2">2金币</option>
+                <option value="5">5金币</option>
+                <option value="10">10金币</option>
+                <option value="20">20金币</option>
+                <option value="20">50金币</option>
+            </select>
+            <button class="btn btn-primary" id="add-task-btn">添加任务</button>
+        </div>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="btn btn-primary" id="parentRefreshBtn">刷新</button>
+        </div>
+
+        <!-- 新增金币参考说明区域 -->
+        <div class="coin-reference">
+            <h3>金币设置参考说明</h3>
+            <p>以下是为不同难度任务设置金币数的参考建议：</p>
+            
+            <div class="coin-levels">
+                <div class="coin-level">
+                    <div class="amount">1-2金币</div>
+                    <div class="desc">简单任务<br>如整理书包、倒垃圾等</div>
+                </div>
+                <div class="coin-level">
+                    <div class="amount">3-5金币</div>
+                    <div class="desc">中等任务<br>如完成作业、阅读30分钟等</div>
+                </div>
+                <div class="coin-level">
+                    <div class="amount">6-10金币</div>
+                    <div class="desc">较难任务<br>如学习新技能、长时间练习等</div>
+                </div>
+                <div class="coin-level">
+                    <div class="amount">10+金币</div>
+                    <div class="desc">挑战性任务<br>如完成大型项目、持续多天的任务等</div>
+                </div>
+            </div>
+            
+            <p style="margin-top: 15px; font-size: 0.9rem; color: #666;">
+                提示：可以根据孩子的年龄和任务难度适当调整金币数，建议保持奖励的公平性和一致性。
+            </p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('parentRefreshBtn').addEventListener('click', function() {
+            location.reload();
+        });
+
+        // 初始化数据
+        function initData() {
+            if (!localStorage.getItem('tasks')) {
+                localStorage.setItem('tasks', JSON.stringify([
+                    { id: 1, name: '完成作业', coins: 5, collected: false },
+                    { id: 2, name: '阅读30分钟', coins: 3, collected: false },
+                    { id: 3, name: '练习乐器', coins: 2, collected: false }
+                ]));
+            }
+            
+            if (!localStorage.getItem('totalCoins')) {
+                localStorage.setItem('totalCoins', '0');
+                localStorage.setItem('todayCollected', '0');
+                localStorage.setItem('lastReset', new Date().toDateString());
+            }
+            
+            // 加载金币设置到表单
+            document.getElementById('total-coins').value = localStorage.getItem('totalCoins');
+            document.getElementById('today-collected').value = localStorage.getItem('todayCollected');
+            
+            renderTaskList();
+        }
+        
+        // 渲染任务列表
+        function renderTaskList() {
+            const taskList = document.getElementById('task-list');
+            taskList.innerHTML = '';
+            
+            const tasks = JSON.parse(localStorage.getItem('tasks'));
+            
+            tasks.forEach(task => {
+                const taskItem = document.createElement('div');
+                taskItem.className = 'task-item';
+                
+                const coinClass = task.collected ? 'coins-collected' : 'coins-available';
+                const statusText = task.collected ? '已领取' : '未领取';
+                
+                taskItem.innerHTML = `
+                    <div class="task-info">
+                        <div class="task-name">${task.name}</div>
+                        <div>
+                            <span class="task-coins ${coinClass}">${task.coins}金币</span>
+                            <span class="task-status">${statusText}</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-danger" onclick="deleteTask(${task.id})">删除</button>
+                `;
+                taskList.appendChild(taskItem);
+            });
+        }
+        
+        // 添加任务
+        document.getElementById('add-task-btn').addEventListener('click', function() {
+            const taskName = document.getElementById('task-name').value.trim();
+            const taskCoins = parseInt(document.getElementById('task-coins').value);
+            
+            if (taskName) {
+                const tasks = JSON.parse(localStorage.getItem('tasks'));
+                const newId = tasks.length > 0 ? Math.max(...tasks.map(t => t.id)) + 1 : 1;
+                
+                tasks.push({
+                    id: newId,
+                    name: taskName,
+                    coins: taskCoins,
+                    collected: false
+                });
+                
+                localStorage.setItem('tasks', JSON.stringify(tasks));
+                document.getElementById('task-name').value = '';
+                renderTaskList();
+            } else {
+                alert('请输入任务名称');
+            }
+        });
+        
+        // 删除任务
+        function deleteTask(id) {
+            const tasks = JSON.parse(localStorage.getItem('tasks'));
+            const updatedTasks = tasks.filter(task => task.id !== id);
+            localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+            renderTaskList();
+        }
+        
+        // 保存金币设置
+        document.getElementById('save-coins-btn').addEventListener('click', function() {
+            const totalCoins = document.getElementById('total-coins').value.trim();
+            const todayCollected = document.getElementById('today-collected').value.trim();
+            
+            if (totalCoins && !isNaN(totalCoins)) {
+                localStorage.setItem('totalCoins', totalCoins);
+            }
+            
+            if (todayCollected && !isNaN(todayCollected)) {
+                localStorage.setItem('todayCollected', todayCollected);
+            }
+            
+            alert('金币设置已保存！');
+        });
+        
+        // 重置金币数据
+        document.getElementById('reset-coins-btn').addEventListener('click', function() {
+            if (confirm('确定要重置金币数据吗？这将把总金币和今日已领取都重置为0。')) {
+                localStorage.setItem('totalCoins', '0');
+                localStorage.setItem('todayCollected', '0');
+                document.getElementById('total-coins').value = '0';
+                document.getElementById('today-collected').value = '0';
+                alert('金币数据已重置！');
+            }
+        });
+        
+        // 初始化
+        initData();
+    </script>
+</body>
+</html>
